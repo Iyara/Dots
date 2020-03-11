@@ -1,4 +1,4 @@
-mport socket
+import socket
 from _thread import *
 import _pickle as pickle
 import time
