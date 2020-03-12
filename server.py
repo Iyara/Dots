@@ -1,6 +1,10 @@
 import socket
 from _thread import *
 import random
+import _pickle as pickle
+import time
+import math
+
 
 server = ""
 port = 5555
@@ -18,13 +22,13 @@ except socket.error as e:
 s.listen()
 print("Server started at ", server, ", waiting for a connection.")
 
-
 # Functions
 
 def threaded_client(conn, _id):
     global connections, players, balls, nxt, start
 
     current_id = _id
+    game_time = 0
 
     #receive a name from the client
     data = conn.recv(16)
@@ -33,27 +37,56 @@ def threaded_client(conn, _id):
 
     #properties for new player
     color = colors[current_id]
-
+    x, y = get_start_location(players)
     players[current_id] = {"x":x, "y":y,"color":color,"score":0,"name":name}
 
     # pickle data and send initial info to clients
     conn.send(str.encode(str(current_id)))
 
+    while True:
+        if start:
+            game_time = round(time.time()-start_time)
+            #if the game time passes the round time the game will stop
+            if game_time >= ROUND_TIME:
+                start = False
+
+        try:
+            #receive data from client
+            data = conn.recv(32)
+            if not data:
+                break
+
+            data = data.decode("utf-8")
+            print("[DATA] Received", data, "from client id", current_id)
+
+            #look for specific commands from received data
+            send_data = pickle.dumps((balls,players, game_time))
+
+            #send data back to clients
+            conn.send(send_data)
+
+        except Exception as e:
+            print(e)
+            break #if exception, disconnect client
+
+        time.sleep(0.001)
+
+    #when user disconnects
+    print("[DISCONNECT] Name:", name, " Client Id:", current_id, "disconnected")
+    connections -= 1
+    del players[current_id]
+    conn.close()
 
 
 
-# Game
+def get_start_location(players):
+    #returns a tuple (x,y)
 
-BALL_RADIUS = 5
-START_RADIUS = 7
+    x = random.randrange(0,W)
+    y = random.randrange(0,H)
 
-players = {}
-balls = []
-connections = 0
-colors = [(255,0,0), (255, 128, 0), (255,255,0), (128,255,0),(0,255,0),(0,255,128),(0,255,255),(0, 128, 255), (0,0,255), (0,0,255), (128,0,255),(255,0,255), (255,0,128),(128,128,128), (0,0,0)]
-_id = 0
-start = False
-nxt = 1
+    return (x,y)
+
 
 def create_balls(balls, n):
     print("n", n)
@@ -63,17 +96,32 @@ def create_balls(balls, n):
     n: the amount of balls to make
     '''
     for i in range(n):
-        while True:
-            stop = True
-            x = random.randrange(0,W)
-            y = random.randrange(0,H)
-            balls.append((x,y, random.choice(colors)))
+        x = random.randrange(0,W)
+        y = random.randrange(0,H)
+        balls.append((x,y, random.choice(colors)))
+
+
+
+
+# Game
+
+BALL_RADIUS = 5
+START_RADIUS = 7
+W, H = 1600, 830
+players = {}
+balls = []
+connections = 0
+colors = [(255,0,0), (255, 128, 0), (255,255,0), (128,255,0),(0,255,0),(0,255,128),(0,255,255),(0, 128, 255), (0,0,255), (0,0,255), (128,0,255),(255,0,255), (255,0,128),(128,128,128), (0,0,0)]
+_id = 0
+start = False
+nxt = 1
+
 
 
 # MAIN LOOP
 
 print("[GAME] Setting up level")
-create_balls(balls, random.randrange(200,250)
+create_balls(balls, random.randrange(200,250))
 print("[SERVER] Waiting for connections")
 
 # keep looking for new connections
