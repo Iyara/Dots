@@ -85,18 +85,23 @@ def draw_text_middle(win, text, size, color):
     win.blit(label, (MENU_WIDTH/2 - (label.get_width()/2), MENU_HEIGHT/3 - (label.get_height()/2)))
 
 
-def redraw_window(win, balls):
+def redraw_window(win, balls, players):
 	win.fill((255,255,255)) # fill screen white, to clear old frames
 	
 	# draw all the orbs/balls
 	for ball in balls:
 		pygame.draw.circle(win, ball[2], (ball[0], ball[1]), BALL_RADIUS)
 
-
+	# draw each player in the list
+	for player in sorted(players, key=lambda x: players[x]["score"]):
+		p = players[player]
+		pygame.draw.circle(win, p["color"], (p["x"], p["y"]), PLAYER_RADIUS + round(p["score"]))
+		text = NAME_FONT.render(p["name"], 1, (0,0,0))
+		win.blit(text, (p["x"] - text.get_width()/2, p["y"] - text.get_height()/2))
 
 
 def main(win, name):
-	print("2name: ", name)
+	#print("2name: ", name)
 	#global players
 
 	# start by connecting to the network
@@ -140,12 +145,13 @@ def main(win, name):
 					run = False
 
 		# redraw window then update the frame
-		redraw_window(win, balls)
+		redraw_window(win, balls, players)
 		pygame.display.update()
 
 	server.disconnect()
 	pygame.quit()
 	quit()
+
 
 
 name = start_menu()
