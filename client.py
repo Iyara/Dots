@@ -1,6 +1,7 @@
 #client.py
 import pygame
 from network import Network
+
 pygame.font.init()
 
 
@@ -22,8 +23,8 @@ balls = []
 
 
 def start_menu():
-	win = pygame.display.set_mode((MENU_WIDTH, MENU_HEIGHT))
-	pygame.display.set_caption("Dots")
+    win = pygame.display.set_mode((MENU_WIDTH, MENU_HEIGHT))
+    pygame.display.set_caption("Dots")
     font = pygame.font.Font(None, 32)
     clock = pygame.time.Clock()
     input_box = pygame.Rect(100, 100, 140, 32)
@@ -88,14 +89,15 @@ def redraw_window(win):
 		pygame.draw.circle(WIN, ball[2], (ball[0], ball[1]), BALL_RADIUS)
 
 
-def main(name, win):
-
+def main(win, name):
+	print("2name: ", name)
 	#global players
 
 	# start by connecting to the network
 	server = Network()
 	current_id = server.connect(name)
 	balls, players, game_time = server.send("get")
+	print("after get")
 
 	# setup the clock
 	clock = pygame.time.Clock()
@@ -135,8 +137,8 @@ def main(name, win):
 
 
 name = start_menu()
-
+print("name: ", name)
 pygame.display.set_caption("Dots")
 win = pygame.display.set_mode((W, H))
 
-main(name, win)
+main(win, name)

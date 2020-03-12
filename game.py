@@ -13,9 +13,3 @@ BALL_RADIUS = 5
 # FUNCTIONS
 
 
-
-
-
-
-
-
