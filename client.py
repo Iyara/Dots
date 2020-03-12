@@ -1,13 +1,16 @@
 #client.py
 import pygame
 from network import Network
+import random
+import os
 
 pygame.font.init()
 
-
 MENU_WIDTH = 640
 MENU_HEIGHT = 480
-
+PLAYER_RADIUS = 10
+START_VEL = 9
+BALL_RADIUS = 5
 W, H = 1600, 830
 
 NAME_FONT = pygame.font.SysFont("comicsans", 20)
@@ -81,12 +84,15 @@ def draw_text_middle(win, text, size, color):
     label = font.render(text, 1, color)
     win.blit(label, (MENU_WIDTH/2 - (label.get_width()/2), MENU_HEIGHT/3 - (label.get_height()/2)))
 
-def redraw_window(win):
+
+def redraw_window(win, balls):
 	win.fill((255,255,255)) # fill screen white, to clear old frames
 	
-		# draw all the orbs/balls
+	# draw all the orbs/balls
 	for ball in balls:
-		pygame.draw.circle(WIN, ball[2], (ball[0], ball[1]), BALL_RADIUS)
+		pygame.draw.circle(win, ball[2], (ball[0], ball[1]), BALL_RADIUS)
+
+
 
 
 def main(win, name):
@@ -97,7 +103,7 @@ def main(win, name):
 	server = Network()
 	current_id = server.connect(name)
 	balls, players, game_time = server.send("get")
-	print("after get")
+	print("balls")
 
 	# setup the clock
 	clock = pygame.time.Clock()
@@ -105,17 +111,23 @@ def main(win, name):
 	run = True
 	while run:
 		clock.tick(30) # 30 fps max
-
+		player = players[current_id]
 
 
 
 		# get key presses
-		keys = pygame.key.get_pressed()		
+		keys = pygame.key.get_pressed()
+
+		data = ""	
 
 		# movement based on key presses
 		if keys[pygame.K_LEFT] or keys[pygame.K_a] or keys[pygame.K_KP4]:
 			pass
 
+		data = "move " + str(player["x"]) + " " + str(player["y"])
+
+		# send data to server and recieve back all players information
+		balls, players, game_time = server.send(data)
 
 		for event in pygame.event.get():
 			# if user hits red x button close window
@@ -128,7 +140,7 @@ def main(win, name):
 					run = False
 
 		# redraw window then update the frame
-		redraw_window()
+		redraw_window(win, balls)
 		pygame.display.update()
 
 	server.disconnect()
@@ -138,6 +150,8 @@ def main(win, name):
 
 name = start_menu()
 print("name: ", name)
+# make window start in top left hand corner
+os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,30)
 pygame.display.set_caption("Dots")
 win = pygame.display.set_mode((W, H))
 
