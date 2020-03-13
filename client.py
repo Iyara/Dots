@@ -86,7 +86,7 @@ def draw_text_middle(win, text, size, color):
 
 
 def redraw_window(win, balls, players):
-	win.fill((255,255,255)) # fill screen white, to clear old frames
+	win.fill((255,255,255)) # fill screen white to clear old frames
 	
 	# draw all the orbs/balls
 	for ball in balls:
