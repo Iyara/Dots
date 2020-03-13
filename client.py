@@ -117,8 +117,9 @@ def main(win, name):
 	while run:
 		clock.tick(30) # 30 fps max
 		player = players[current_id]
-
-
+		vel = START_VEL - round(player["score"]/14)
+		if vel <= 1:
+			vel = 1
 
 		# get key presses
 		keys = pygame.key.get_pressed()
@@ -127,8 +128,22 @@ def main(win, name):
 
 		# movement based on key presses
 		if keys[pygame.K_LEFT] or keys[pygame.K_a] or keys[pygame.K_KP4]:
-			pass
+			if player["x"] - vel - PLAYER_RADIUS - player["score"] >= 0:
+				player["x"] = player["x"] - vel
 
+		if keys[pygame.K_RIGHT] or keys[pygame.K_d] or keys[pygame.K_KP6]:
+			if player["x"] + vel + PLAYER_RADIUS + player["score"] <= W:
+				player["x"] = player["x"] + vel
+
+		if keys[pygame.K_UP] or keys[pygame.K_w] or keys[pygame.K_KP8]:
+			if player["y"] - vel - PLAYER_RADIUS - player["score"] >= 0:
+				player["y"] = player["y"] - vel
+
+		if keys[pygame.K_DOWN] or keys[pygame.K_s] or keys[pygame.K_KP2]:
+			if player["y"] + vel + PLAYER_RADIUS + player["score"] <= H:
+				player["y"] = player["y"] + vel
+
+		# make data string
 		data = "move " + str(player["x"]) + " " + str(player["y"])
 
 		# send data to server and recieve back all players information
