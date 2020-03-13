@@ -60,6 +60,14 @@ def threaded_client(conn, _id):
             print("[DATA] Received", data, "from client id", current_id)
 
             #look for specific commands from received data
+            if data.split(" ")[0] == "move":
+                split_data = data.split(" ")
+                x = int(split_data[1])
+                y = int(split_data[2])
+                players[current_id]["x"] = x
+                players[current_id]["y"] = y
+
+
             send_data = pickle.dumps((balls,players, game_time))
 
             #send data back to clients
