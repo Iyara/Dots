@@ -104,8 +104,19 @@ def create_balls(balls, n):
     n: the amount of balls to make
     '''
     for i in range(n):
-        x = random.randrange(0,W)
-        y = random.randrange(0,H)
+        while True:
+            stop = True
+            x = random.randrange(0,W)
+            y = random.randrange(0,H)
+            for player in players:
+                p = players[player]
+                dis = math.sqrt((x - p["x"])**2 + (y - p["y"])**2)
+                if dis <= START_RADIUS + p["score"]:
+                    stop = False
+
+            if stop:
+                break
+
         balls.append((x,y, random.choice(colors)))
 
 
