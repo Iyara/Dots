@@ -67,6 +67,7 @@ def threaded_client(conn, _id):
                 players[current_id]["x"] = x
                 players[current_id]["y"] = y
 
+                check_collision(players, balls)
 
             send_data = pickle.dumps((balls,players, game_time))
 
@@ -119,6 +120,19 @@ def create_balls(balls, n):
 
         balls.append((x,y, random.choice(colors)))
 
+
+def check_collision(players, balls):
+    for player in players:
+        p = players[player]
+        x = p["x"]
+        y = p["y"]
+        for ball in balls:
+            bx = ball[0]
+            by = ball[1]
+            dis = math.sqrt((x - bx)**2 + (y - by)**2)
+            if dis <= START_RADIUS + p["score"]:
+                p["score"] = p["score"] + 0.5
+                balls.remove(ball)
 
 
 
