@@ -108,7 +108,7 @@ def main(win, name):
 	server = Network()
 	current_id = server.connect(name)
 	balls, players, game_time = server.send("get")
-	print("balls")
+	#print("balls")
 
 	# setup the clock
 	clock = pygame.time.Clock()
@@ -143,6 +143,31 @@ def main(win, name):
 			if player["y"] + vel + PLAYER_RADIUS + player["score"] <= H:
 				player["y"] = player["y"] + vel
 
+		if keys[pygame.K_KP7]:
+			if player["x"] - vel - PLAYER_RADIUS - player["score"] >= 0:
+				player["x"] = player["x"] - vel
+			if player["y"] - vel - PLAYER_RADIUS - player["score"] >= 0:
+				player["y"] = player["y"] - vel
+
+		if keys[pygame.K_KP9]:
+			if player["x"] + vel + PLAYER_RADIUS + player["score"] <= W:
+				player["x"] = player["x"] + vel
+			if player["y"] - vel - PLAYER_RADIUS - player["score"] >= 0:
+				player["y"] = player["y"] - vel
+
+		if keys[pygame.K_KP1]:
+			if player["x"] - vel - PLAYER_RADIUS - player["score"] >= 0:
+				player["x"] = player["x"] - vel
+			if player["y"] + vel + PLAYER_RADIUS + player["score"] <= H:
+				player["y"] = player["y"] + vel
+
+		if keys[pygame.K_KP3]:
+			if player["x"] + vel + PLAYER_RADIUS + player["score"] <= W:
+				player["x"] = player["x"] + vel
+			if player["y"] + vel + PLAYER_RADIUS + player["score"] <= H:
+				player["y"] = player["y"] + vel
+
+
 		# make data string
 		data = "move " + str(player["x"]) + " " + str(player["y"])
 
@@ -170,7 +195,7 @@ def main(win, name):
 
 
 name = start_menu()
-print("name: ", name)
+#print("name: ", name)
 # make window start in top left hand corner
 os.environ['SDL_VIDEO_WINDOW_POS'] = "%d,%d" % (0,30)
 pygame.display.set_caption("Dots")
